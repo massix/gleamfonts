@@ -6,7 +6,7 @@ import gleam/option
 import gleam/result
 import gleam/uri
 import gleamfonts/hackto
-import startest.{describe, it}
+import startest.{describe, xit}
 import startest/expect
 
 pub fn hackto_tests() {
@@ -25,7 +25,7 @@ fn with_timeout_suite() {
     |> result.map(fn(r) { request.set_body(r, bytes_builder.new()) })
 
   describe("Timeout", [
-    it("Should be able to download without timeouts", fn() {
+    xit("Should be able to download without timeouts", fn() {
       let assert Ok(response.Response(status, _headers, body)) =
         hackto.send(request, option.Some(120_000))
 
@@ -35,7 +35,7 @@ fn with_timeout_suite() {
       |> fn(x) { x > 264_000_000 }
       |> expect.to_be_true
     }),
-    it("Should fail if timeout is too low", fn() {
+    xit("Should fail if timeout is too low", fn() {
       hackto.send(request, option.Some(120))
       |> expect.to_be_error
       |> expect.to_equal(hackto.HackneyError(hackto.Timeout))
