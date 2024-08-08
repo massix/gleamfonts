@@ -2,18 +2,20 @@ GLEAM := $(shell which gleam)
 BIN := ./gleamfonts
 SRCS := $(wildcard src/**/*.gleam)
 
+export ESQLITE_USE_SYSTEM ?= 1
+
 .PHONY: clean check-format format test build
 
 all: $(BIN)
 
-$(BIN): deps
+$(BIN): build
 	$(GLEAM) run -m gleescript
 
 build: deps
-	$(GLEAM) build
+	$(GLEAM) build -t erlang
 
 test: deps
-	$(GLEAM) test
+	$(GLEAM) test -t erlang
 
 deps:
 	$(GLEAM) deps download
