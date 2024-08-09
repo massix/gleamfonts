@@ -65,15 +65,8 @@ fn read_input_int(
     |> result.map_error(fn(_) { GenericError("I/O Error while reading input") }),
   )
 
-  case int.parse(input) {
-    Error(_) -> {
-      case default {
-        option.Some(x) -> Ok(x)
-        option.None -> Error(GenericError("Could not parse input as integer"))
-      }
-    }
-    Ok(s) -> Ok(s)
-  }
+  option.or(option.from_result(int.parse(input)), default)
+  |> option.to_result(GenericError("Could not parse input as integer"))
 }
 
 fn choose_release(
@@ -95,7 +88,6 @@ fn choose_release(
     )
   })
 
-  let assert option.Some(_default_release) = tools.item_at(releases, 0)
   use read_index <- result.try(read_input_int(
     " ~ Your choice (default: 0) > ",
     option.Some(0),

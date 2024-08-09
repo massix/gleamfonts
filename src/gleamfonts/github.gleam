@@ -1,4 +1,5 @@
 import birl
+import gleam/bool
 import gleam/bytes_builder
 import gleam/dynamic.{field, int, list, string}
 import gleam/hackney
@@ -307,21 +308,17 @@ pub fn download_asset(
   in_memory mem: Bool,
 ) -> GResult(GithubDownloadedAsset) {
   use bits <- result.try(download(in.browser_download_url))
+  use <- bool.guard(when: mem, return: Ok(MemoryAsset(bits)))
 
-  case mem {
-    True -> Ok(MemoryAsset(bits))
-    False -> {
-      let tools.TmpFolder(working_folder) =
-        tools.make_temporary_folder(option.Some("gleamfonts"))
+  let tools.TmpFolder(working_folder) =
+    tools.make_temporary_folder(option.Some("gleamfonts"))
 
-      let to = working_folder <> in.name
+  let to = working_folder <> in.name
 
-      use _ <- result.try(
-        simplifile.write_bits(to:, bits:)
-        |> result.map_error(fn(e) { ErrorCannotWriteFile(to, e) }),
-      )
+  use _ <- result.try(
+    simplifile.write_bits(to:, bits:)
+    |> result.map_error(ErrorCannotWriteFile(to, _)),
+  )
 
-      Ok(FileAsset(to))
-    }
-  }
+  Ok(FileAsset(to))
 }

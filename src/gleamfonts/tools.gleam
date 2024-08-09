@@ -11,10 +11,7 @@ pub type TmpFolder {
 
 /// Better version of os.env, returning an option instead of an error
 pub fn get_env(key k: String) -> option.Option(String) {
-  case os.get_env(k) {
-    Ok(s) -> option.Some(s)
-    Error(_) -> option.None
-  }
+  option.from_result(os.get_env(k))
 }
 
 /// Retrieves the path to be used to store the database
@@ -41,10 +38,7 @@ pub fn random(from list: List(a)) -> option.Option(a) {
 
 /// Gets the head of the list
 pub fn first(from list: List(a)) -> option.Option(a) {
-  case list {
-    [] -> option.None
-    [f, ..] -> option.Some(f)
-  }
+  option.from_result(list.first(list))
 }
 
 /// Similar to `each' but the predicate gets the current index
@@ -53,12 +47,11 @@ pub fn iterate_list(in l: List(a), predicate p: fn(Int, a) -> Nil) -> Nil {
 }
 
 fn iterate_list_acc(l: List(a), p: fn(Int, a) -> Nil, acc: Int) -> Nil {
-  case list.is_empty(l) {
-    True -> Nil
-    False -> {
-      let assert Ok(elt) = list.first(l)
+  case l {
+    [] -> Nil
+    [elt, ..rest] -> {
       p(acc, elt)
-      iterate_list_acc(list.drop(l, 1), p, acc + 1)
+      iterate_list_acc(rest, p, acc + 1)
     }
   }
 }
@@ -66,21 +59,16 @@ fn iterate_list_acc(l: List(a), p: fn(Int, a) -> Nil, acc: Int) -> Nil {
 /// Gets the item at the index i from the list
 /// Returns Some(a) if the item is found, None if the index does not exist
 pub fn item_at(from list: List(a), index i: Int) -> option.Option(a) {
-  case list.drop(list, i) |> list.first {
-    Ok(a) -> option.Some(a)
-    Error(_) -> option.None
-  }
+  list.drop(list, i) |> first
 }
 
+// FIXME: Do not panic
+/// Creates a temporary folder inside the configured TMPDIR.
 pub fn make_temporary_folder(prefix p: option.Option(String)) -> TmpFolder {
-  let prefix = case p {
-    option.Some(opt) -> opt
-    option.None -> ""
-  }
-
+  let prefix = option.unwrap(p, "")
   let tmpdir = get_env("TMPDIR") |> option.unwrap("/tmp")
-
   let path = [tmpdir, prefix, gluid.guidv4(), ""] |> string.join("/")
+
   case simplifile.create_directory_all(path) {
     Ok(_) -> TmpFolder(path)
     Error(_) -> panic as { "Could not create folder: " <> path }

@@ -98,8 +98,8 @@ pub fn connector_tests() {
         |> list.all(fn(r) { r.releases_url == "releases_url" })
         |> expect.to_be_true
 
-        all_repositories
-        |> tools.iterate_list(fn(idx, elt) { expect.to_equal(idx + 1, elt.id) })
+        use idx, elt <- tools.iterate_list(all_repositories)
+        expect.to_equal(idx + 1, elt.id)
       }),
     ]),
     describe("github_release", [

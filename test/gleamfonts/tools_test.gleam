@@ -159,12 +159,16 @@ fn make_temporary_folder_gen(with_prefix p: Bool) {
 
 fn iterate_list_suite() {
   describe("Iterate over list", [
-    it("Should iterate", fn() {
+    it("Should iterate over a full list", fn() {
       ["0", "1", "2", "3"]
       |> tools.iterate_list(fn(i, e) {
         let assert Ok(res) = int.parse(e)
         expect.to_equal(res, i)
       })
+    }),
+    it("should not iterate if list is empty", fn() {
+      []
+      |> tools.iterate_list(fn(_, _) { panic as "Should not arrive here" })
     }),
   ])
 }
