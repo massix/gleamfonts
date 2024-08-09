@@ -11,6 +11,7 @@ import startest/expect
 pub fn tools_tests() {
   describe("tools", [
     iterate_list_suite(),
+    first_suite(),
     make_temporary_folder_suite(),
     random_suite(),
     item_at_suite(),
@@ -67,6 +68,18 @@ fn check_random(list: List(a), max_repeats: Int) -> Bool {
       }
     }
   }
+}
+
+fn first_suite() {
+  describe("First element", [
+    it("Empty list", fn() { [] |> tools.first |> expect.to_be_none }),
+    it("Single element", fn() {
+      [1] |> tools.first |> expect.to_be_some |> expect.to_equal(1)
+    }),
+    it("Many elements", fn() {
+      [1, 2, 3, 4] |> tools.first |> expect.to_be_some |> expect.to_equal(1)
+    }),
+  ])
 }
 
 fn random_suite() {

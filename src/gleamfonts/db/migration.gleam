@@ -340,6 +340,8 @@ const local_migrations = [
       description text not null
     ) strict;
 
+    -- We don't care much about foreign key with github_repository
+    -- since we only work with a single repository anyways..
     create table github_release(
       id int primary key not null,
       url text not null,
@@ -349,18 +351,14 @@ const local_migrations = [
     ) strict;
 
     create table github_asset(
-      url text primary key not null,
+      id int primary key not null,
+      url text,
       browser_download_url text not null,
       name text not null,
       label text,
-      created_at int
-    ) strict;
-
-    create table github_release_to_asset(
+      created_at int,
       release_id int not null,
-      asset_url text not null,
-      foreign key(release_id) references github_release(id),
-      foreign key(asset_url) references github_asset(url)
+      foreign key(release_id) references github_release(id)
     ) strict;
     ",
   ),

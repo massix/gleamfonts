@@ -27,6 +27,14 @@ pub fn random(from list: List(a)) -> option.Option(a) {
   }
 }
 
+/// Gets the head of the list
+pub fn first(from list: List(a)) -> option.Option(a) {
+  case list {
+    [] -> option.None
+    [f, ..] -> option.Some(f)
+  }
+}
+
 /// Similar to `each' but the predicate gets the current index
 pub fn iterate_list(in l: List(a), predicate p: fn(Int, a) -> Nil) -> Nil {
   iterate_list_acc(l, p, 0)

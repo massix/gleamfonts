@@ -46,6 +46,7 @@ fn generate_random_assets(
 
       let new_asset =
         github.GithubAsset(
+          0,
           download_url,
           download_url,
           font_name,

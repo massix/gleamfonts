@@ -27,7 +27,7 @@ pub type GResult(a) =
 
 /// Represents a GithubRepository for which we have all the
 /// needed information.
-pub opaque type GithubRepository {
+pub type GithubRepository {
   GithubRepository(
     id: Int,
     releases_url: String,
@@ -74,6 +74,7 @@ pub type GithubError {
 
 pub type GithubAsset {
   GithubAsset(
+    id: Int,
     url: uri.Uri,
     browser_download_url: uri.Uri,
     name: String,
@@ -201,8 +202,9 @@ pub fn list_releases(
   )
 
   let asset_decoder =
-    dynamic.decode5(
+    dynamic.decode6(
       GithubAsset,
+      field("id", int),
       field("url", decode_uri),
       field("browser_download_url", decode_uri),
       field("name", string),
