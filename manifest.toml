@@ -18,7 +18,6 @@ packages = [
   { name = "gleam_json", version = "2.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_json", source = "hex", outer_checksum = "CB10B0E7BF44282FB25162F1A24C1A025F6B93E777CCF238C4017E4EEF2CDE97" },
   { name = "gleam_otp", version = "0.10.0", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_stdlib"], otp_app = "gleam_otp", source = "hex", outer_checksum = "0B04FE915ACECE539B317F9652CAADBBC0F000184D586AAAF2D94C100945D72B" },
   { name = "gleam_stdlib", version = "0.39.0", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "2D7DE885A6EA7F1D5015D1698920C9BAF7241102836CE0C3837A4F160128A9C4" },
-  { name = "gleescript", version = "1.4.0", build_tools = ["gleam"], requirements = ["argv", "filepath", "gleam_erlang", "gleam_stdlib", "simplifile", "snag", "tom"], otp_app = "gleescript", source = "hex", outer_checksum = "8CDDD29F91064E69950A91A40061785F10275ADB70A0520075591F61A724C455" },
   { name = "glesha", version = "0.1.4", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "glesha", source = "hex", outer_checksum = "31AAC355BF83A0565D858252F81193A61F4E6C3763D071EA6F76BA7686E8A65A" },
   { name = "glint", version = "1.0.1", build_tools = ["gleam"], requirements = ["gleam_community_ansi", "gleam_community_colour", "gleam_stdlib", "snag"], otp_app = "glint", source = "hex", outer_checksum = "369C8A289017F73581D6B9FE2F5748169EB6FA021FFAA34FA7A49EE2094C73B3" },
   { name = "gluid", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gluid", source = "hex", outer_checksum = "9C0D64DC9A345B7DCC76A2EFDC1F3479E3C6A08A1FB81156E9CCED959F8DEB78" },
@@ -45,7 +44,6 @@ gleam_hackney = { version = ">= 1.2.0 and < 2.0.0" }
 gleam_http = { version = ">= 3.6.0 and < 4.0.0" }
 gleam_json = { version = ">= 2.0.0 and < 3.0.0" }
 gleam_stdlib = { version = ">= 0.34.0 and < 2.0.0" }
-gleescript = { version = ">= 1.4.0 and < 2.0.0" }
 glesha = { version = ">= 0.1.4 and < 1.0.0" }
 gluid = { version = ">= 1.0.0 and < 2.0.0" }
 hackney = { version = ">= 1.20.1 and < 2.0.0" }
