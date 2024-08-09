@@ -1,0 +1,58 @@
+#+HTML: <div align="center">
+#+HTML: <img alt="Project Logo" src="assets/logo.png" width="250" /><br/>
+#+HTML: </div>
+
+* Gleamfonts
+Simple command line tool to easily fetch and install [[https://www.nerdfonts.com/][Nerdfonts]] in a [[https://termux.dev/en/][Termux]]
+environment.
+
+The tool is written using the [[https://gleam.run/][Gleam programming language]] and needs a working
+[[https://www.erlang.org/][Erlang]] VM to be used locally.
+
+** How to compile locally
+While I figure out a proper way of creating a binary distribution (I am still
+quite new to this whole ecosystem) you can use it locally by following the
+instructions below:
+
+1. Clone the repository locally, somewhere in your home folder in Termux:
+   #+begin_src bash
+   mkdir -p ~/dev
+   cd ~/dev
+   git clone https://github.com/massix/gleamfonts.git
+   cd gleamfonts
+   #+end_src
+2. Install Erlang, Gleam and SQLite using the official package manager:
+   #+begin_src bash
+   pkg update && pkg install -y erlang gleam libsqlite
+   #+end_src
+3. Compile the project
+   #+begin_src bash
+   make build
+   #+end_src
+4. If the compilation is successful (and hopefully it will be), you can run
+   the project with:
+   #+begin_src bash
+   gleam run -- --help
+   #+end_src
+
+   Which will show you a help page and explain how to use the CLI.
+
+** How it works
+The first time the program is run, it will fetch all the needed information
+from the GitHub's releases page of the [[https://github.com/ryanoasis/nerd-fonts][official repository]], presenting the
+user with a wide variety of choices regarding which specific release to use
+and which asset (font) to download.  Once the user has made their choice,
+Gleamfonts will download the corresponding ZIP file and ask the user which
+specific variant of the font to install (this is due to the fact that Termux
+does not support multiple variants, only a single ttf file can be installed).
+
+Gleamfonts will then extract *that* variant of the chosen font into a
+temporary folder and ask the user if they trust Gleamfonts enough to replace
+the default Termux font with the newly downloaded one.  Should the user
+refuse, Gleamfonts will exit right after printing the local path where the
+file can be found.
+
+* Contributions
+All contributions are of course welcome, this is a hobby project and I think
+it is simple enough to be used a starting point for learning Gleam.  There are
+quite some unit tests which should cover most of the codebase.
