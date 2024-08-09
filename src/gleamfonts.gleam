@@ -60,7 +60,7 @@ fn read_input_int(
   default: option.Option(Int),
 ) -> Result(Int, RuntimeError) {
   case erlang.get_line(prompt) {
-    Error(_) -> panic as "I/O Error"
+    Error(_) -> Error(GenericError("I/O Error while reading input"))
     Ok(s) ->
       case int.parse(s |> string.trim) {
         Error(_) -> {
