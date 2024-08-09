@@ -59,19 +59,20 @@ fn read_input_int(
   prompt: String,
   default: option.Option(Int),
 ) -> Result(Int, RuntimeError) {
-  case erlang.get_line(prompt) {
-    Error(_) -> Error(GenericError("I/O Error while reading input"))
-    Ok(s) ->
-      case int.parse(s |> string.trim) {
-        Error(_) -> {
-          case default {
-            option.Some(x) -> Ok(x)
-            option.None ->
-              Error(GenericError("Could not parse input as integer"))
-          }
-        }
-        Ok(s) -> Ok(s)
+  use input <- result.try(
+    erlang.get_line(prompt)
+    |> result.map(string.trim)
+    |> result.map_error(fn(_) { GenericError("I/O Error while reading input") }),
+  )
+
+  case int.parse(input) {
+    Error(_) -> {
+      case default {
+        option.Some(x) -> Ok(x)
+        option.None -> Error(GenericError("Could not parse input as integer"))
       }
+    }
+    Ok(s) -> Ok(s)
   }
 }
 
