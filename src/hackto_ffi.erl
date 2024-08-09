@@ -7,10 +7,7 @@ send({hackney_request, Method, Url, Body, Headers, Timeout}) ->
     {with_body, true},
     {max_body, infinity},
     {async, false},
-    {connect_timeout, Timeout},
-    {checkout_timeout, Timeout},
     {recv_timeout, Timeout},
-    {send_timeout, Timeout},
     {follow_redirect, true}
   ],
   case hackney:request(Method, Url, Headers, Body, Options) of
