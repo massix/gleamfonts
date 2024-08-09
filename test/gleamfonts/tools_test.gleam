@@ -12,6 +12,7 @@ pub fn tools_tests() {
   describe("tools", [
     iterate_list_suite(),
     first_suite(),
+    cache_dir_suite(),
     make_temporary_folder_suite(),
     random_suite(),
     item_at_suite(),
@@ -93,6 +94,21 @@ fn random_suite() {
     }),
     it("All equal", fn() {
       [1, 1, 1, 1, 1] |> check_random(10) |> expect.to_be_false
+    }),
+  ])
+}
+
+fn cache_dir_suite() {
+  describe("Cache dir", [
+    it("works with env var set", fn() {
+      os.set_env("XDG_CACHE_HOME", "/some-cache-dir")
+      tools.get_cache_dir() |> expect.to_equal("/some-cache-dir/gleamfonts/")
+    }),
+    it("works without env var set", fn() {
+      let assert option.Some(home) = tools.get_env("HOME")
+      os.unset_env("XDG_CACHE_HOME")
+      tools.get_cache_dir()
+      |> expect.to_equal(home <> "/.cache/gleamfonts/")
     }),
   ])
 }

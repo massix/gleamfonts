@@ -17,6 +17,18 @@ pub fn get_env(key k: String) -> option.Option(String) {
   }
 }
 
+/// Retrieves the path to be used to store the database
+pub fn get_cache_dir() -> String {
+  let cache_dir =
+    get_env("XDG_CACHE_HOME")
+    |> option.or(get_env("HOME") |> option.map(fn(p) { p <> "/.cache" }))
+    |> option.unwrap("/tmp")
+    |> string.append("/gleamfonts/")
+
+  cache_dir
+}
+
+/// Gets a random element from the list
 pub fn random(from list: List(a)) -> option.Option(a) {
   case list {
     [] -> option.None
