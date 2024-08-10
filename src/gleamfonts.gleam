@@ -287,8 +287,18 @@ fn with_cache(c: connector.Connector) -> Result(Nil, RuntimeError) {
     }),
   )
 
-  choose_release(releases)
-  |> result.try(common_path)
+  let ret =
+    choose_release(releases)
+    |> result.try(common_path)
+
+  let disconnect =
+    connector.disconnect(c)
+    |> result.map(fn(_) { Nil })
+    |> result.map_error(FromConnectorModule)
+
+  [ret, disconnect]
+  |> result.all
+  |> result.map(fn(_) { Nil })
 }
 
 fn without_cache() -> Result(Nil, RuntimeError) {
