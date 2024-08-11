@@ -17,7 +17,7 @@ import gleamfonts/unzip
 import simplifile
 import sqlight
 
-const version = "1.0.0"
+const version = "1.0.1"
 
 type RuntimeError {
   FromGithubModule(github.GithubError)
