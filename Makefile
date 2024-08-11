@@ -52,6 +52,7 @@ $(DIST_TAR): $(PACKAGE)
 	mkdir -p ./tmp/usr/bin
 	cp -r ./build/erlang-shipment/* ./tmp/usr/opt/gleamfonts/
 	install -m 0775 ./scripts/gleamfonts ./tmp/usr/bin/gleamfonts
-	tar -czf $(DIST_TAR) -C ./tmp usr
+	cp ./LICENSE ./tmp
+	tar -czf $(DIST_TAR) -C ./tmp usr LICENSE
 	rm -fr ./tmp
 
