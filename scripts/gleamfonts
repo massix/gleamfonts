@@ -1,0 +1,7 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# vi: ft=bash cc=80
+
+GLEAMFONTS_PATH="/data/data/com.termux/files/usr/opt/gleamfonts"
+ENTRYPOINT="${GLEAMFONTS_PATH}/entrypoint.sh"
+
+exec ${ENTRYPOINT} run -- "$@"

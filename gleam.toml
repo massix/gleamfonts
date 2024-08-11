@@ -1,16 +1,16 @@
 name = "gleamfonts"
 version = "1.0.0"
+description = "Command-line tool to fetch and install fonts from NerdFonts repository"
+licences = ["MIT"]
 
-# Fill out these fields if you intend to generate HTML documentation or publish
-# your project to the Hex package manager.
-#
-# description = ""
-# licences = ["Apache-2.0"]
-# repository = { type = "github", user = "", repo = "" }
-# links = [{ title = "Website", href = "" }]
-#
-# For a full reference of all the available options, you can have a look at
-# https://gleam.run/writing-gleam/gleam-toml/.
+[repository]
+type = "github"
+user = "massix"
+repo = "gleamfonts"
+
+[[links]]
+title = "GitHub Repository"
+href = "https://github.com/massix/gleamfonts"
 
 [dependencies]
 gleam_stdlib = ">= 0.34.0 and < 2.0.0"
