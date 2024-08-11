@@ -137,27 +137,36 @@ fn choose_font(
   let content = unzip.list_asset_content(in)
   case content {
     Ok(r) -> {
-      io.println("\n\n")
-      io.println(
-        "Choose which font to install from the given asset from the list below",
-      )
-      r
-      |> tools.iterate_list(fn(i, zc) {
-        case zc {
-          unzip.Comment(_) -> Nil
-          unzip.File(name, ..) -> io.println(int.to_string(i) <> ") " <> name)
-        }
-      })
+      case list.length(r) {
+        0 ->
+          Error(GenericError(
+            "No installable fonts found in this package.\nOnly TrueType Fonts are compatible with Termux and some NerdFonts packages (like Overpass) contain only OTF fonts.\nPlease retry!",
+          ))
+        _ -> {
+          io.println("\n\n")
+          io.println(
+            "Choose which font to install from the given asset from the list below",
+          )
 
-      use read_index <- result.try(read_input_int(
-        " ~ Your choice > ",
-        option.None,
-      ))
-      let chosen_file = tools.item_at(r, read_index)
-      case chosen_file {
-        option.None ->
-          Error(GenericError("File with that index does not exist"))
-        option.Some(a) -> Ok(ZipAndAsset(in, a))
+          tools.iterate_list(r, fn(i, zc) {
+            case zc {
+              unzip.Comment(_) -> Nil
+              unzip.File(name, ..) ->
+                io.println(int.to_string(i) <> ") " <> name)
+            }
+          })
+
+          use read_index <- result.try(read_input_int(
+            " ~ Your choice > ",
+            option.None,
+          ))
+          let chosen_file = tools.item_at(r, read_index)
+          case chosen_file {
+            option.None ->
+              Error(GenericError("File with that index does not exist"))
+            option.Some(a) -> Ok(ZipAndAsset(in, a))
+          }
+        }
       }
     }
     Error(e) -> Error(FromUnzipModule(e))
