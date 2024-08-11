@@ -124,7 +124,8 @@ fn filter_fonts(in: List(ZipContent)) -> List(ZipContent) {
   list.filter(in, fn(zc) {
     case zc {
       Comment(_) -> False
-      File(name, ..) -> string.ends_with(name, ".ttf")
+      File(name, ..) ->
+        string.ends_with(name, ".ttf") || string.ends_with(name, ".otf")
     }
   })
 }

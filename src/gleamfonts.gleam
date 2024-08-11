@@ -140,7 +140,7 @@ fn choose_font(
       case list.length(r) {
         0 ->
           Error(GenericError(
-            "No installable fonts found in this package.\nOnly TrueType Fonts are compatible with Termux and some NerdFonts packages (like Overpass) contain only OTF fonts.\nPlease retry!",
+            "No installable fonts found in this package.\nOnly TrueType Fonts and OpenType Fonts are compatible with Termux and some NerdFonts packages (like FontPatcher) contain only incompatible fonts.\nPlease retry!",
           ))
         _ -> {
           io.println("\n\n")
