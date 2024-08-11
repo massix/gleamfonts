@@ -52,7 +52,7 @@ fn print_error(in: RuntimeError) -> Nil {
     GenericError(s) -> s
   }
 
-  io.println(string)
+  io.println_error(string)
 }
 
 fn read_input_int(
@@ -228,7 +228,7 @@ fn with_cache(c: connector.Connector) -> Result(Nil, RuntimeError) {
         Error(_) -> Error(GenericError("Could not run migrations"))
       }
     })
-    |> option.unwrap(Error(GenericError(""))),
+    |> option.unwrap(Error(GenericError("Could not retrieve a connection"))),
   )
 
   io.println("Cache system ready")
@@ -244,11 +244,11 @@ fn with_cache(c: connector.Connector) -> Result(Nil, RuntimeError) {
 
   use repo <- result.try(case repo {
     option.None -> {
-      io.println("No repositories found in the cache, fetching it from GitHub")
+      io.println("No repository found in the cache, fetching from GitHub")
       github.get_main_repository()
       |> result.map_error(FromGithubModule)
       |> result.try(fn(r) {
-        io.println("Fetched from GitHub, storing it into the cache")
+        io.println("Fetched from GitHub, storing into the cache")
         connector.store_repository(c, r)
         |> result.map(fn(id) {
           io.println("Stored repository with id: " <> int.to_string(id))
@@ -267,9 +267,7 @@ fn with_cache(c: connector.Connector) -> Result(Nil, RuntimeError) {
       case list.is_empty(l) {
         False -> Ok(l)
         True -> {
-          io.println(
-            "No releases found in the cache, fetching them from Github",
-          )
+          io.println("No releases found in the cache, fetching from Github")
           github.list_releases(repo)
           |> result.map(list.take(_, 10))
           |> result.map_error(FromGithubModule)
