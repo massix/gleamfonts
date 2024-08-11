@@ -75,29 +75,35 @@ fn list_content_suite() {
   describe("List content", [
     it("Can list from files", fn() {
       let file_path = [data_folder, "0xProto.zip"] |> string.join(with: "/")
-      unzip.list_asset_content(github.FileAsset(file_path))
-      |> expect.to_be_ok
-      |> list.filter_map(fn(zc) {
-        case zc {
-          unzip.File(name, ..) -> Ok(name)
-          unzip.Comment(..) -> Error(Nil)
-        }
-      })
-      |> expect.list_to_contain("0xProtoNerdFont-Regular.ttf")
+      let result =
+        unzip.list_asset_content(github.FileAsset(file_path))
+        |> expect.to_be_ok
+        |> list.filter_map(fn(zc) {
+          case zc {
+            unzip.File(name, ..) -> Ok(name)
+            unzip.Comment(..) -> Error(Nil)
+          }
+        })
+
+      result |> list.all(string.ends_with(_, ".ttf")) |> expect.to_be_true
+      result |> expect.list_to_contain("0xProtoNerdFont-Regular.ttf")
     }),
     it("Can list from BitArray", fn() {
       let file_path = [data_folder, "0xProto.zip"] |> string.join(with: "/")
       let assert Ok(bit_content) = simplifile.read_bits(file_path)
 
-      unzip.list_asset_content(github.MemoryAsset(bit_content))
-      |> expect.to_be_ok
-      |> list.filter_map(fn(zc) {
-        case zc {
-          unzip.File(name, ..) -> Ok(name)
-          _ -> Error(Nil)
-        }
-      })
-      |> expect.list_to_contain("0xProtoNerdFontMono-Regular.ttf")
+      let result =
+        unzip.list_asset_content(github.MemoryAsset(bit_content))
+        |> expect.to_be_ok
+        |> list.filter_map(fn(zc) {
+          case zc {
+            unzip.File(name, ..) -> Ok(name)
+            _ -> Error(Nil)
+          }
+        })
+
+      result |> list.all(string.ends_with(_, ".ttf")) |> expect.to_be_true
+      result |> expect.list_to_contain("0xProtoNerdFontMono-Regular.ttf")
     }),
   ])
 }

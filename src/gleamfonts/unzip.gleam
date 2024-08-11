@@ -120,6 +120,15 @@ fn ffi_unzip_result_to_gleam(
   |> result.map_error(dynamic_to_zip_error)
 }
 
+fn filter_fonts(in: List(ZipContent)) -> List(ZipContent) {
+  list.filter(in, fn(zc) {
+    case zc {
+      Comment(_) -> False
+      File(name, ..) -> string.ends_with(name, ".ttf")
+    }
+  })
+}
+
 pub fn list_asset_content(
   asset in: github.GithubDownloadedAsset,
 ) -> Result(List(ZipContent), ZipError) {
@@ -127,9 +136,11 @@ pub fn list_asset_content(
     github.FileAsset(p) ->
       erl_unzip_list_dir_file(p |> charlist.from_string)
       |> ffi_list_dir_result_to_gleam
+      |> result.map(filter_fonts)
     github.MemoryAsset(b) ->
       erl_unzip_list_dir_binary(b)
       |> ffi_list_dir_result_to_gleam
+      |> result.map(filter_fonts)
   }
 }
 
