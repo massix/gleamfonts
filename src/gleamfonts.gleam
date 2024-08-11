@@ -17,6 +17,8 @@ import gleamfonts/unzip
 import simplifile
 import sqlight
 
+const version = "1.0.0"
+
 type RuntimeError {
   FromGithubModule(github.GithubError)
   FromUnzipModule(unzip.ZipError)
@@ -347,49 +349,62 @@ fn common_path(in: github.GithubRelease) -> Result(Nil, RuntimeError) {
   })
 }
 
-fn print_usage(program_path: String) -> Nil {
+fn print_usage(program_path: String) -> Result(Nil, Nil) {
   io.println(
-    "usage: " <> program_path <> " [--delete-cache] [--no-cache] [--help]",
+    "usage: "
+    <> program_path
+    <> " [--delete-cache] [--no-cache] [--help] [--version]",
   )
-  io.println("  if --no-cache is specified, fetch all the data from GitHub")
-  io.println("     ignoring the local cache (if any)")
-  io.println("  if --delete-cache is specified, remove the old cache first")
-  io.println("     and then store everything into the newly created cache")
-  io.println("  if both --delete-cache and --no-cache are specified, then")
-  io.println("     --delete-cache won't have any effect")
+  io.println("  --no-cache fetch all the data from GitHub, ignoring the cache")
+  io.println("  --delete-cache remove the old cache first")
+  io.println("  --help print this help page and exit")
+  io.println("  --version print version information and exit")
+
+  Ok(Nil)
+}
+
+fn print_version() -> Result(Nil, Nil) {
+  io.println("gleamfonts " <> version)
+  Ok(Nil)
 }
 
 pub fn main() {
   let argv = argv.load()
 
   case list.contains(argv.arguments, "--help") {
-    True -> Ok(print_usage(argv.program))
+    True -> print_usage(argv.program)
     False ->
-      case list.contains(argv.arguments, "--no-cache") {
-        False -> {
-          let db_file = tools.get_cache_dir() <> "db.sqlite"
-          use _ <- result.try(
-            simplifile.create_directory_all(tools.get_cache_dir())
-            |> result.map_error(fn(e) { print_error(FromSimplifileModule(e)) }),
-          )
+      case list.contains(argv.arguments, "--version") {
+        True -> print_version()
+        False ->
+          case list.contains(argv.arguments, "--no-cache") {
+            False -> {
+              let db_file = tools.get_cache_dir() <> "db.sqlite"
+              use _ <- result.try(
+                simplifile.create_directory_all(tools.get_cache_dir())
+                |> result.map_error(fn(e) {
+                  print_error(FromSimplifileModule(e))
+                }),
+              )
 
-          case list.contains(argv.arguments, "--delete-cache") {
-            True -> {
-              let _ = simplifile.delete(db_file)
-              Nil
+              case list.contains(argv.arguments, "--delete-cache") {
+                True -> {
+                  let _ = simplifile.delete(db_file)
+                  Nil
+                }
+                False -> Nil
+              }
+
+              connector.new()
+              |> connector.connect(db_file)
+              |> result.map_error(FromConnectorModule)
+              |> result.try(with_cache)
+              |> result.map_error(print_error)
             }
-            False -> Nil
+            True ->
+              without_cache()
+              |> result.map_error(print_error)
           }
-
-          connector.new()
-          |> connector.connect(db_file)
-          |> result.map_error(FromConnectorModule)
-          |> result.try(with_cache)
-          |> result.map_error(print_error)
-        }
-        True ->
-          without_cache()
-          |> result.map_error(print_error)
       }
   }
 }
