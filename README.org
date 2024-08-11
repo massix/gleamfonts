@@ -9,10 +9,9 @@ environment.
 The tool is written using the [[https://gleam.run/][Gleam programming language]] and needs a working
 [[https://www.erlang.org/][Erlang]] VM to be used locally.
 
-** How to compile locally
-While I figure out a proper way of creating a binary distribution (I am still
-quite new to this whole ecosystem) you can use it locally by following the
-instructions below:
+** Install from source
+You can manually install gleamfonts into your system by following the steps
+below.
 
 1. Clone the repository locally, somewhere in your home folder in Termux:
    #+begin_src bash
@@ -27,15 +26,18 @@ instructions below:
    #+end_src
 3. Compile the project
    #+begin_src bash
-   make build
+   make clean install
    #+end_src
-4. If the compilation is successful (and hopefully it will be), you can run
-   the project with:
-   #+begin_src bash
-   gleam run -- --help
-   #+end_src
+   This step will install the binary distribution inside the
+   ~/data/data/com.termux/files/usr/opt/gleamfonts~ folder, along with a
+   convenient [[./scripts/gleamfonts][script]] to make it easier to launch the application without
+   knowing all the details of how to launch an Erlang application.  The
+   script will be installed inside ~/data/data/com.termux/files/usr/bin~,
+   making it available in your PATH.
 
-   Which will show you a help page and explain how to use the CLI.
+To verify that the installation is successful, reload your environment (or
+restart the Termux application) and launch ~gleamfonts --help~, you should
+be greeted with the help page of the application.
 
 ** How it works
 The first time the program is run, it will fetch all the needed information
