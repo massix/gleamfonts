@@ -5,6 +5,7 @@ import gleam/int
 import gleam/io
 import gleam/list
 import gleam/option
+import gleam/otp/task
 import gleam/result
 import gleam/string
 import gleamfonts/db/connector
@@ -77,7 +78,7 @@ fn choose_release(
   )
 
   releases
-  |> list.take(10)
+  |> list.take(15)
   |> tools.iterate_list(fn(index, release) {
     io.println(
       int.to_string(index)
@@ -269,13 +270,18 @@ fn with_cache(c: connector.Connector) -> Result(Nil, RuntimeError) {
         True -> {
           io.println("No releases found in the cache, fetching from Github")
           github.list_releases(repo)
-          |> result.map(list.take(_, 10))
+          |> result.map(list.take(_, 15))
           |> result.map_error(FromGithubModule)
           |> result.try(fn(l) {
             list.map(l, fn(r) {
-              io.println("Fetched release: " <> r.tag_name <> " storing in DB")
-              connector.store_release(c, r)
+              task.async(fn() {
+                io.println(
+                  "Fetched release: " <> r.tag_name <> " storing in DB",
+                )
+                connector.store_release(c, r)
+              })
             })
+            |> list.map(task.await_forever)
             |> result.all
             |> result.map(fn(_) { l })
             |> result.map_error(FromConnectorModule)

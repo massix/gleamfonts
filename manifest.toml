@@ -43,6 +43,7 @@ gleam_erlang = { version = ">= 0.25.0 and < 1.0.0" }
 gleam_hackney = { version = ">= 1.2.0 and < 2.0.0" }
 gleam_http = { version = ">= 3.6.0 and < 4.0.0" }
 gleam_json = { version = ">= 2.0.0 and < 3.0.0" }
+gleam_otp = { version = ">= 0.10.0 and < 1.0.0" }
 gleam_stdlib = { version = ">= 0.34.0 and < 2.0.0" }
 glesha = { version = ">= 0.1.4 and < 1.0.0" }
 gluid = { version = ">= 1.0.0 and < 2.0.0" }
