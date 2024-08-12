@@ -378,6 +378,9 @@ pub fn main() {
         True -> print_version()
         False ->
           case list.contains(argv.arguments, "--no-cache") {
+            True ->
+              without_cache()
+              |> result.map_error(print_error)
             False -> {
               let db_file = tools.get_cache_dir() <> "db.sqlite"
               use _ <- result.try(
@@ -401,9 +404,6 @@ pub fn main() {
               |> result.try(with_cache)
               |> result.map_error(print_error)
             }
-            True ->
-              without_cache()
-              |> result.map_error(print_error)
           }
       }
   }
