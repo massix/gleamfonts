@@ -411,7 +411,8 @@ fn with_cache(
           })
         }
       }
-    }),
+    })
+    |> result.map(github.sort_and_filter_releases),
   )
 
   let ret =
