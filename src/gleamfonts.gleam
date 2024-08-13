@@ -1,3 +1,4 @@
+import application_behavior
 import argv
 import birl
 import gleam/erlang
@@ -243,8 +244,6 @@ fn with_cache(c: connector.Connector) -> Result(Nil, RuntimeError) {
     |> option.unwrap(Error(GenericError("Could not retrieve a connection"))),
   )
 
-  io.println("Cache system ready")
-
   // Now retrieve the repositories we have in the cache
   use repo <- result.try(
     connector.get_all_repositories(c)
@@ -256,16 +255,11 @@ fn with_cache(c: connector.Connector) -> Result(Nil, RuntimeError) {
 
   use repo <- result.try(case repo {
     option.None -> {
-      io.println("No repository found in the cache, fetching from GitHub")
       github.get_main_repository()
       |> result.map_error(FromGithubModule)
       |> result.try(fn(r) {
-        io.println("Fetched from GitHub, storing into the cache")
         connector.store_repository(c, r)
-        |> result.map(fn(id) {
-          io.println("Stored repository with id: " <> int.to_string(id))
-          r
-        })
+        |> result.map(fn(_) { r })
         |> result.map_error(FromConnectorModule)
       })
     }
@@ -279,18 +273,12 @@ fn with_cache(c: connector.Connector) -> Result(Nil, RuntimeError) {
       case list.is_empty(l) {
         False -> Ok(l)
         True -> {
-          io.println("No releases found in the cache, fetching from Github")
           github.list_releases(repo)
           |> result.map(list.take(_, 15))
           |> result.map_error(FromGithubModule)
           |> result.try(fn(l) {
             list.map(l, fn(r) {
-              task.async(fn() {
-                io.println(
-                  "Fetched release: " <> r.tag_name <> " storing in DB",
-                )
-                connector.store_release(c, r)
-              })
+              task.async(fn() { connector.store_release(c, r) })
             })
             |> list.map(task.await_forever)
             |> result.all
@@ -371,40 +359,33 @@ fn print_version() -> Result(Nil, Nil) {
 pub fn main() {
   let argv = argv.load()
 
-  case list.contains(argv.arguments, "--help") {
-    True -> print_usage(argv.program)
-    False ->
-      case list.contains(argv.arguments, "--version") {
-        True -> print_version()
-        False ->
-          case list.contains(argv.arguments, "--no-cache") {
-            True ->
-              without_cache()
-              |> result.map_error(print_error)
-            False -> {
-              let db_file = tools.get_cache_dir() <> "db.sqlite"
-              use _ <- result.try(
-                simplifile.create_directory_all(tools.get_cache_dir())
-                |> result.map_error(fn(e) {
-                  print_error(FromSimplifileModule(e))
-                }),
-              )
+  let behavior =
+    application_behavior.get_application_behavior(fn() { argv.arguments })
 
-              case list.contains(argv.arguments, "--delete-cache") {
-                True -> {
-                  let _ = simplifile.delete(db_file)
-                  Nil
-                }
-                False -> Nil
-              }
-
-              connector.new()
-              |> connector.connect(db_file)
-              |> result.map_error(FromConnectorModule)
-              |> result.try(with_cache)
-              |> result.map_error(print_error)
-            }
-          }
+  case behavior {
+    application_behavior.PrintHelp -> print_usage(argv.program)
+    application_behavior.PrintVersion -> print_version()
+    application_behavior.WithCache(delete) -> {
+      let db_file = tools.get_cache_dir() <> "db.sqlite"
+      use _ <- result.try(
+        simplifile.create_directory_all(tools.get_cache_dir())
+        |> result.map_error(fn(e) { print_error(FromSimplifileModule(e)) }),
+      )
+      case delete {
+        True -> {
+          let _ = simplifile.delete(db_file)
+          Nil
+        }
+        False -> Nil
       }
+
+      connector.new()
+      |> connector.connect(db_file)
+      |> result.map_error(FromConnectorModule)
+      |> result.try(with_cache)
+      |> result.map_error(print_error)
+    }
+    application_behavior.WithoutCache ->
+      without_cache() |> result.map_error(print_error)
   }
 }
