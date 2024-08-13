@@ -15,6 +15,7 @@ import gleam/string
 import gleam/uri
 import gleamfonts/hackto
 import gleamfonts/tools
+import gleamfonts/translate as t
 import simplifile
 
 const owner = "ryanoasis"
@@ -98,7 +99,10 @@ pub fn is_asset_in_memory(asset in: GithubDownloadedAsset) -> Bool {
 }
 
 /// Helper function for debugging the errors
-pub fn describe_error(error error: GithubError) -> String {
+pub fn describe_error(
+  error error: GithubError,
+  translations t: option.Option(t.Translations),
+) -> String {
   let trunc = fn(in: String) -> String {
     case string.length(in) {
       x if x <= 0 -> "Empty body"
@@ -108,21 +112,76 @@ pub fn describe_error(error error: GithubError) -> String {
   }
 
   case error {
-    ErrorCannotCreateUri(s) -> "Cannot create URI from: " <> s
+    ErrorCannotCreateUri(s) ->
+      t.translate(
+        t,
+        t.Key("github_cannot_create_uri"),
+        "Cannot create URI from: {{ string }}",
+        [#("string", s)],
+      )
     ErrorCannotCreateRequest(u) ->
-      "Cannot create request from: " <> uri.to_string(u)
+      t.translate(
+        t,
+        t.Key("github_cannot_create_request"),
+        "Cannot create request from: {{ uri }}",
+        [#("uri", uri.to_string(u))],
+      )
     ErrorCannotSendRequest(r, _) ->
-      "Cannot send request from: " <> { r |> request.to_uri |> uri.to_string }
+      t.translate(
+        t,
+        t.Key("github_cannot_send_request"),
+        "Cannot send request from: {{ uri }}",
+        [#("uri", r |> request.to_uri |> uri.to_string)],
+      )
     ErrorCannotSendBinaryRequest(r, _) ->
-      "Cannot send binary request from: "
-      <> { r |> request.to_uri |> uri.to_string }
-    ErrorCannotDecodeResponse(b) -> "Cannot decode body: " <> trunc(b)
+      t.translate(
+        t,
+        t.Key("github_cannot_send_binary_request"),
+        "Cannot send binary request from: {{ uri }}",
+        [#("uri", r |> request.to_uri |> uri.to_string)],
+      )
+    ErrorCannotDecodeResponse(b) ->
+      t.translate(
+        t,
+        t.Key("github_cannot_decode_response"),
+        "Cannot decode body: {{ body }}",
+        [#("body", trunc(b))],
+      )
     ErrorInvalidHttpCode(c) ->
-      "Invalid HTTP code received: " <> int.to_string(c)
-    ErrorInvalidRedirect -> "Status code for redirect, but no location found"
-    ErrorCannotCreateTempFolder(s, _) -> "Failed to create folder at: " <> s
-    ErrorCannotWriteFile(s, _) -> "Failed to create file at: " <> s
-    ErrorCannotDownloadAsset(_, _) -> "Failed to download asset"
+      t.translate(
+        t,
+        t.Key("github_invalid_http_code"),
+        "Invalid HTTP code received: {{ code }}",
+        [#("code", int.to_string(c))],
+      )
+    ErrorInvalidRedirect ->
+      t.translate(
+        t,
+        t.Key("github_invalid_redirect"),
+        "Status code for redirect, but no location found",
+        [],
+      )
+    ErrorCannotCreateTempFolder(s, _) ->
+      t.translate(
+        t,
+        t.Key("github_cannot_create_temp_folder"),
+        "Failed to create folder at: {{ location }}",
+        [#("location", s)],
+      )
+    ErrorCannotWriteFile(s, _) ->
+      t.translate(
+        t,
+        t.Key("github_cannot_write_file"),
+        "Failed to create file at: {{ location }}",
+        [#("location", s)],
+      )
+    ErrorCannotDownloadAsset(_, _) ->
+      t.translate(
+        t,
+        t.Key("github_cannot_download_asset"),
+        "Failed to download asset",
+        [],
+      )
   }
 }
 

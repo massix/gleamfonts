@@ -126,14 +126,14 @@ pub fn github_tests() {
     describe("Describe error", [
       it("Should not truncate the message", fn() {
         github.ErrorCannotCreateUri("something")
-        |> github.describe_error
+        |> github.describe_error(option.None)
         |> expect.to_equal("Cannot create URI from: something")
       }),
       it("Should truncate the message", fn() {
         github.ErrorCannotDecodeResponse(
           "this string is longer than 80 chars, so it should be truncated by the describe_error function",
         )
-        |> github.describe_error
+        |> github.describe_error(option.None)
         |> expect.to_equal(
           "Cannot decode body: this string is longer than 80 chars, so it should be truncated by the describe_e...",
         )
