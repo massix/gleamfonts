@@ -21,7 +21,7 @@ jobs:
       - run: make dist
       - uses: softprops/action-gh-release@v2
         with:
-          files: gleamfonts.tgz
+          files: gleamfonts-*.tgz
           draft: false
           name: "gleamfonts ${{ github.ref_name }}"
           mke_latest: "true"
