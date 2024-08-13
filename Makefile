@@ -1,8 +1,9 @@
 GLEAM := $(shell which gleam)
+VERSION := $(shell cat gleam.toml | grep "version =" | cut -d '=' -f 2 | tr -d ' ' | tr -d '"')
 TERMUX_PREFIX ?= /data/data/com.termux/files
-RUN_SCRIPT := ./scripts/gleamfonts
-DIST_TAR := gleamfonts.tgz
-ENTRYPOINT := ./build/erlang-shipment/entrypoint.sh
+RUN_SCRIPT := scripts/gleamfonts
+DIST_TAR := gleamfonts-$(VERSION).tgz
+ENTRYPOINT := build/erlang-shipment/entrypoint.sh
 
 export ESQLITE_USE_SYSTEM ?= 1
 
@@ -35,16 +36,16 @@ erlang-shipment: $(SRCS)
 install: package
 	sed -i 's|#!/bin/sh|#!$(TERMUX_PREFIX)/usr/bin/sh|' $(ENTRYPOINT)
 	mkdir -p $(TERMUX_PREFIX)/usr/opt/gleamfonts
-	cp -r ./build/erlang-shipment/* $(TERMUX_PREFIX)/usr/opt/gleamfonts/
+	cp -r build/erlang-shipment/* $(TERMUX_PREFIX)/usr/opt/gleamfonts/
 	install -m 0775 $(RUN_SCRIPT) $(TERMUX_PREFIX)/usr/bin/gleamfonts
 
 dist: package
 	sed -i 's|#!/bin/sh|#!$(TERMUX_PREFIX)/usr/bin/sh|' $(ENTRYPOINT)
-	mkdir -p ./tmp/usr/opt/gleamfonts
-	mkdir -p ./tmp/usr/bin
-	cp -r ./build/erlang-shipment/* ./tmp/usr/opt/gleamfonts/
-	install -m 0775 $(RUN_SCRIPT) ./tmp/usr/bin/gleamfonts
-	cp ./LICENSE ./tmp
-	tar -czf $(DIST_TAR) -C ./tmp usr LICENSE
-	rm -fr ./tmp
+	mkdir -p tmp/gleamfonts-$(VERSION)/usr/opt/gleamfonts
+	mkdir -p tmp/gleamfonts-$(VERSION)/usr/bin
+	cp -r build/erlang-shipment/* tmp/gleamfonts-$(VERSION)/usr/opt/gleamfonts/
+	install -m 0775 $(RUN_SCRIPT) tmp/gleamfonts-$(VERSION)/usr/bin/gleamfonts
+	install -m 0644 LICENSE tmp/gleamfonts-$(VERSION)/LICENSE
+	tar -czf $(DIST_TAR) -C tmp gleamfonts-$(VERSION)
+	rm -fr tmp
 
