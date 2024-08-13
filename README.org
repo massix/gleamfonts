@@ -39,6 +39,20 @@ To verify that the installation is successful, reload your environment (or
 restart the Termux application) and launch ~gleamfonts --help~, you should
 be greeted with the help page of the application.
 
+** Install from a release
+At the [[https://github.com/massix/gleamfonts/releases][releases]] page, choose the most recent one and download the enclosed
+tarball, then extract it into ~/data/data/com.termux/files~ using the
+following command:
+#+begin_src bash
+tar -xzf gleamfonts-x.x.x.tgz --strip-components=1 -C /data/data/com.termux/files
+#+end_src
+
+You will still need to install the Erlang VM and the SQLite library using
+the default package manager:
+#+begin_src bash
+pkg update && pkg install erlang libsqlite
+#+end_src
+
 ** How it works
 The first time the program is run, it will fetch all the needed information
 from the GitHub's releases page of the [[https://github.com/ryanoasis/nerd-fonts][official repository]], presenting the
@@ -53,6 +67,29 @@ temporary folder and ask the user if they trust Gleamfonts enough to replace
 the default Termux font with the newly downloaded one.  Should the user
 refuse, Gleamfonts will exit right after printing the local path where the
 file can be found.
+
+
+** Translations
+Gleamfonts is actually translated in three different languages: English,
+French and Italian. By default, it will try to detect which language to use
+based on the value of the environment variable ~LANG~. If you want to force
+a specific language, you can inject the environment variable at launch time:
+#+begin_src bash
+LANG=it_IT.UTF-8 gleamfonts --help
+#+end_src
+
+#+begin_src
+istruzioni: gleamfonts [--delete-cache] [--no-cache] [--help] [--version]
+  --no-cache recupera tutti i dati da GitHub, ignorando la cache
+  --delete-cache rimuove la cache esistente prima
+  --help mostra questa pagina di aiuto ed esci
+  --version mostra la versione del software ed esci
+#+end_src
+
+If you want to add a translation for your language, feel free to submit a
+pull request, you just need to add your language under the [[./priv/][priv]] folder, in a
+file named following the convention of the UNIX locale (for example:
+~de_DE.json~ for the German translation)
 
 * Contributions
 All contributions are of course welcome, this is a hobby project and I think
