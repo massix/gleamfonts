@@ -337,11 +337,9 @@ fn common_path(in: github.GithubRelease) -> Result(Nil, RuntimeError) {
   })
 }
 
-fn print_usage(program_path: String) -> Result(Nil, Nil) {
+fn print_usage() -> Result(Nil, Nil) {
   io.println(
-    "usage: "
-    <> program_path
-    <> " [--delete-cache] [--no-cache] [--help] [--version]",
+    "usage: gleamfonts [--delete-cache] [--no-cache] [--help] [--version]",
   )
   io.println("  --no-cache fetch all the data from GitHub, ignoring the cache")
   io.println("  --delete-cache remove the old cache first")
@@ -363,7 +361,7 @@ pub fn main() {
     application_behavior.get_application_behavior(fn() { argv.arguments })
 
   case behavior {
-    application_behavior.PrintHelp -> print_usage(argv.program)
+    application_behavior.PrintHelp -> print_usage()
     application_behavior.PrintVersion -> print_version()
     application_behavior.WithCache(delete) -> {
       let db_file = tools.get_cache_dir() <> "db.sqlite"
